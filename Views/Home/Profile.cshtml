@@ -1,0 +1,120 @@
+﻿@model SellerItemViewModel
+@using Microsoft.AspNetCore.Identity
+@{
+    ViewBag.Title = "Profile";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-auto" style="border-right: 2px solid #ddd;">
+            <!-- User Profile Picture -->
+            @if(Model.ProfilePicture != null)
+            {
+                <img style="height: 250px; width: 250px; object-fit:cover; border:solid 1px black"
+                src="data:image/*;base64,@(Convert.ToBase64String(Model.ProfilePicture))" />
+            }
+            else
+            {
+                <img style="object-fit:cover; border:solid 1px black"
+                     src="~/img/default-avatar.jpg" />
+            }
+        </div>
+        <div class="col-md-6" style="height: 100%;">
+            <div style="height: calc(100% - 50%); ">
+                <!-- User Details -->
+                <h5>User Details</h5>
+                <p>
+                    @Model.FirstName @Model.LastName <br />
+                    @Model.Email <br />
+                    @Model.PhoneNumber
+                </p>
+                <span>Rating: @ViewBag.AverageRating</span>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row" style="height: auto;">
+        <div class="col-md-auto">
+            <div class="row">
+                <!-- Seller's Item -->
+                <h3>Seller's Item</h3>
+                @foreach (Item item in Model.ItemList)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card" style="height:auto; width:200px; border: 1px solid">
+                            <div style="border-bottom: 1px solid; height: 200px; overflow: hidden;">
+                                <img style="object-fit:cover; height: 100%; width: 100%;" class="img-fluid"
+                                        src="data:image/*;base64,@(Convert.ToBase64String(item.ItemImage))" />
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title" style="font-weight:bold; text-align: center;">@item.Name</p>
+                                <hr>
+                                <p class="card-text" style="text-align: center;">
+                                    Highest Bidder: @(item.highestBidder != null ? item.highestBidder : "none")<br />
+                                    Bid ends: @((item.BidEnd - DateTime.Now).Days + 1)
+                                    @((item.BidEnd - DateTime.Now).Days + 1 == 1 ? "day" : "days") left
+                                </p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-center">
+                                <a class="btn btn-primary" asp-controller="Item" asp-action="Details" asp-route-id="@item.ItemId">View Item</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="container py-5">
+    <h2 class="text-center mb-5">Reviews</h2>
+
+    <!-- Add new review form -->
+    <form method="post" asp-action="AddReview">
+        <input type="hidden" name="seller" value="@Model.UserName" />
+
+        <div class="mb-3">
+            <label for="feedback" class="form-label">Leave a Review</label>
+            <textarea class="form-control" id="feedback" name="feedback" rows="3" maxlength="350" required></textarea>
+            <div class="invalid-feedback">
+                Please provide a review.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating</label>
+            <input type="number" class="form-control" id="rating" name="rating" min="1" max="10" required>
+            <div class="invalid-feedback">
+                Please provide a rating between 1 and 10.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+    <hr>
+    <!-- Existing reviews -->
+    <div class="row">
+        @foreach (UserReview rev in Model.ReviewList)
+        {
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            @rev.reviewer
+                        </h4>
+                        <p class="card-text">
+                            @rev.feedback
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Rated @rev.rating/10</small>
+                    </div>
+                </div>
+            </div>
+        }
+       
+    </div>
+</div>
+

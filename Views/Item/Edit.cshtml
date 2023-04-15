@@ -1,0 +1,138 @@
+﻿@model Item
+@{
+    ViewBag.Title = ViewBag.Action;
+
+    var bidStartValue = (ViewBag.Action == "Sell Item") ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm") : Model.BidStart.ToString("yyyy-MM-ddTHH:mm");
+}
+<h1 style="text-align: center;">@ViewBag.Action</h1>
+
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="container">
+    <div class="d-flex justify-content-evenly">
+      
+
+    <form class="row g-3" asp-controller="Item" asp-action="Edit" method="post" enctype="multipart/form-data">
+        <div class="row g-3">
+
+            <div class="col-sm-6">
+
+                <!--Hidden Inputs-->
+                <input asp-for="Seller" value="@ViewBag.User" hidden />
+                <input asp-for="ItemId" value="@Model.ItemId" hidden />
+                <input asp-for="Buyer" value="@Model.Buyer" hidden />
+                <input asp-for="highestBidder" value="@Model.highestBidder" hidden />
+
+                <!--Category Input-->
+                <div class="input-group mb-3">
+
+                    <label class="input-group-text" asp-for="CategoryId">Category</label>
+                    <select asp-for="CategoryId" aria-label="Category"
+                            class="form-select" placeholder="Select a category">
+                        @foreach (Category c in ViewBag.ItemCategory)
+                        {
+                            <option value="@c.CategoryId">@c.Name</option>
+                        }
+                    </select>
+
+                </div>
+
+                <!--Item name (Text Input)-->
+                <div class="input-group mb-3">
+
+                    <label class="input-group-text" id="inputGroup-sizing-default"
+                            asp-for="Name">Item Name</label>
+                    <input asp-for="Name" type="text" class="form-control" aria-label="Item Name" />
+
+                </div>
+
+                <!--Item name (Text Area)-->
+                <div class="input-group mb-3">
+
+                    <label class="input-group-text" id="inputGroup-sizing-default"
+                            asp-for="Description">Description</label>
+                    <textarea asp-for="Description" class="form-control" aria-label="Description"></textarea>
+
+                </div>
+
+                <!--Buy Now Price (accepts decimal datatype)-->
+                <div class="input-group mb-3">
+
+                    <label class="input-group-text" id="inputGroup-sizing-default"
+                            asp-for="BuyNowPrice">Buy Now Price</label>
+                    <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                    <input type="number" asp-for="BuyNowPrice" aria-label="Buy Now Price"
+                            class="form-control" step="0.01" min="1" />
+
+                </div>
+
+                <!--Starting Bid Price (Number Input)-->
+                <div class="input-group mb-3">
+
+                    <label class="input-group-text" id="inputGroup-sizing-default"
+                            asp-for="StartingBidPrice">Starting Bid Price</label>
+                    <span class="input-group-text" id="inputGroup-sizing-default">$</span>
+                    <input type="number" asp-for="StartingBidPrice" aria-label="Starting Bid Price"
+                            class="form-control" step="0.01" min="1" />
+
+                </div>
+
+                <!--Bidding Start-->
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text" id="inputGroup-sizing-default"
+                            asp-for="BidStart">Bidding Start</label>
+                    <input type="datetime-local" value="@bidStartValue"
+                            asp-for="BidStart" class="form-control" aria-label="Bidding Start" />
+
+                </div>
+
+                <!--Bidding End-->
+                <div class="input-group btn-group mb-3" role="group" aria-label="Basic radio toggle button group">
+
+                    <label for="btnradio" class="input-group-text" id="inputGroup-sizing-default">Bidding End</label>
+
+                    <input value="1" type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="btnradio1">1 day</label>
+
+                    <input value="3" type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio2">3 days</label>
+
+                    <input value="5" type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btnradio3">5 days</label>
+                </div>
+            </div>
+            <div class="col-md-auto m-auto justify-content-lg-center">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="ItemImage" style="width:100%;" hidden> </label>
+                    @if (Model.ItemImage != null)
+                    {
+                        <input asp-for="ItemImage" value="@Convert.ToBase64String(Model.ItemImage)" hidden />
+                        <img id="itemPicture" style="width:300px;height:300px;object-fit:cover"
+                                src="data:image/*;base64,@(Convert.ToBase64String(Model.ItemImage))" />
+                    }
+                    else
+                    {
+                        <img id="itemPicture" style="width:300px;height:300px;object-fit:cover" src="" />
+                    }
+
+                    <input type="file"
+                            accept=".png,.jpg,.jpeg,.gif,.tif"
+                            asp-for="ItemImage"
+                            class="form-control"
+                               onchange="document.getElementById('itemPicture').src=window.URL.createObjectURL(this.files[0])" />
+                        <span asp-validation-for="ItemImage" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+            <div class="row g-3 justify-content-start">
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a asp-action="Index" class="btn btn-danger" role="button">Cancel</a>
+                </div>              
+            </div>
+    </form>
+    </div>
+</div>

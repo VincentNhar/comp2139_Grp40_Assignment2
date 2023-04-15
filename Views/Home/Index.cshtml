@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Item>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a asp-controller="Home" asp-action="Index" asp-route-category="" 
+                        asp-route-searchString="@ViewBag.SearchString" class="nav-link" aria-current="page">All Categories</a>
+                </li>
+                @foreach (Category c in ViewBag.ItemCategory)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index" asp-route-category="@c.Name"
+                       asp-route-searchString="@ViewBag.SearchString">@c.Name</a>
+                    </li>
+                }
+            </ul>
+            <form class="d-flex" asp-controller="Home" asp-action="Index" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="search" name="searchString" placeholder="Search" aria-label="Search" value="@ViewBag.SearchString">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </div>
+                <a class="btn btn-sm btn-outline-danger ms-2" asp-controller="Home" asp-action="Index" asp-route-category="" asp-route-searchString="">Clear Filter</a>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+    @foreach (Item item in Model)
+    {
+        <div class="col mb-4">
+            <div class="card" style="height:auto; width:200px; border: 1px solid">
+                @if (ViewBag.ItemImages.ContainsKey(item) && ViewBag.ItemImages[item] != null)
+                {
+                    <div style="border-bottom: 1px solid; height: 200px; overflow: hidden;">
+                        <img style="object-fit:cover; height: 100%; width: 100%;" class="img-fluid"
+                             src="data:image/*;base64,@(ViewBag.ItemImages[item])" />
+                    </div>
+                }
+                <div class="card-body">
+                    <p class="card-title" style="font-weight:bold; text-align: center;">@item.Name</p>
+                    <hr>
+                    <p class="card-text" style="text-align: center;">
+                        Buy Now Price: <strong>$@item.BuyNowPrice</strong><br />
+                        Starting Price: <strong>$@item.StartingBidPrice</strong>
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-center">
+                    <a class="btn btn-primary" asp-controller="Item" asp-action="Details" asp-route-id="@item.ItemId">Bid Now</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+

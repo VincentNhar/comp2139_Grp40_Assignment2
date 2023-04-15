@@ -1,0 +1,96 @@
+﻿@model IEnumerable<Item>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    // grabs the credentials of logged in user
+    var user = await UserManager.GetUserAsync(User);
+    var username = user.UserName;
+
+    ViewData["Title"] = "Item Page";
+}
+
+<h2>Manage my auctioned items</h2>
+<div class="container">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Create" asp-route-username="@username" class="btn btn-outline-primary">Sell New Item</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Picture</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Highest Bidder</th>
+                <th>Bid Start Date</th>
+                <th>Bid Closing Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (ViewBag.ItemImages.ContainsKey(item) && ViewBag.ItemImages[item] != null)
+                        {
+                            <img style="object-fit:cover; width:40px;height:40px;" class="img-fluid"
+                                     src="data:image/*;base64,@(ViewBag.ItemImages[item])" />
+                        }
+                    </td>
+                    <td>@item.Name</td>
+                    <td>
+                        @foreach (var category in ViewBag.ItemCategory)
+                        {
+                            if (item.CategoryId == category.Id)
+                            {
+                                @category.Name
+                            }
+                        }
+                    </td>
+                    <td>@(item.highestBidder != null ? item.highestBidder : "none")</td>
+                    <td>@item.BidStart.ToString("dddd, MMMM d, h:mm tt")</td>
+                    <td>@item.BidEnd.ToString("dddd, MMMM d, h:mm tt")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-itemId="@item.ItemId" class="btn btn-primary">Edit</a>
+                        <button type="button" class="btn btn-danger" 
+                        data-bs-toggle="modal" data-bs-target="#modalConfirmation"
+                        onclick="deleteItem(@item.ItemId, '@item.Name')">
+                            Delete </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalConfirmation" tabindex="-1" aria-labelledby="modal-confirmation-box" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Delete the item?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <span id="itemName"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" name="deleteId" id="deleteId" value="" />
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-danger" value="Delete"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteItem(itemId, itemName) {
+            document.getElementById("deleteId").value = itemId;
+            document.getElementById("itemName").textContent = itemName;
+            console.log(itemId)
+        }
+    </script>
+}
